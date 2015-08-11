@@ -1,30 +1,39 @@
 DESCRIPTION = "A virtual keyboard for touch-screen based user interfaces"
-HOMEPAGE = "https://wiki.maliit.org/Main_Page"
 
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LICENSE.LGPL;md5=5c917f6ce94ceb8d8d5e16e2fca5b9ad"
 
 inherit qmake5
 
-SRC_URI = "git://github.com/maliit/framework.git;branch=master \
-    file://0001-Fix-MALIIT_INSTALL_PRF-to-allow-the-build-with-opene.patch \
-    file://maliit-server.desktop \
-    file://qt5.3-fix.patch \
-"
-
-SRCREV = "17fdf8699c53ddfb2c15df8e11d46804e782fec5"
-PV = "0.99.0+git${SRCPV}"
-
-
-PACKAGES =+ "${PN}-gtk"
-GTKIMMODULES_PACKAGES = "${PN}-gtk"
-
 DEPENDS = "qtdeclarative"
 
-# FIXME: Do we need something like this with qt5?
-#RDEPENDS_${PN} = "qt4-plugin-inputmethod-imsw-multi libqtsvg4"
+SRC_URI = "git://github.com/maliit/framework.git \
+    file://0001-Fix-MALIIT_INSTALL_PRF-to-allow-the-build-with-opene.patch \
+    file://maliit-server.desktop \
+"
 
-RRECOMMENDS_${PN} = "maliit-plugins-qt5"
+SRCREV = "60b1b10de14f932420313c547ab801daf522d539"
+PV = "0.99.0+git${SRCPV}"
+S = "${WORKDIR}/git"
+
+EXTRA_QMAKEVARS_PRE += "\
+    CONFIG+=nodoc \
+    CONFIG+=noxcb \
+    CONFIG+=notests \
+    CONFIG+=enable-dbus-activation \
+    CONFIG+=qt5-inputcontext \
+    MALIIT_INSTALL_PRF=${QMAKE_MKSPEC_PATH}/mkspecs/features \
+"
+
+do_install_append() {
+    # Fix absolute paths
+    sed -i -e "s|/usr|${STAGING_DIR_TARGET}${prefix}|" ${D}/${libdir}/${QT_DIR_NAME}/mkspecs/features/maliit-framework.prf
+    sed -i -e "s|/usr|${STAGING_DIR_TARGET}${prefix}|" ${D}/${libdir}/${QT_DIR_NAME}/mkspecs/features/maliit-plugins.prf
+    install -d ${D}${datadir}/applications
+    install -m 644 ${WORKDIR}/maliit-server.desktop ${D}${datadir}/applications
+}
+
+PACKAGES += "maliit-inputcontext-qt5 ${PN}-examples"
 
 FILES_${PN} += "\
     ${libdir}/*.so* \
@@ -33,8 +42,12 @@ FILES_${PN} += "\
     ${datadir}/dbus-1 \
 "
 
-FILES_${PN}-dbg += "\
-    ${libdir}/maliit-framework-tests \
+FILES_maliit-inputcontext-qt5 = "\
+    ${OE_QMAKE_PATH_PLUGINS}/platforminputcontexts \
+"
+
+FILES_${PN}-examples = "\
+    ${libdir}/maliit-framework-tests/plugins/examples \
 "
 
 FILES_${PN}-dev += "\
@@ -43,32 +56,10 @@ FILES_${PN}-dev += "\
     ${libdir}/qt5/mkspecs \
 "
 
-EXTRA_QMAKEVARS_PRE = "\
-    PREFIX=${prefix} \
-    LIBDIR=${libdir} \
-    DATADIR=${datadir} \
-    QT_IM_PLUGIN_PATH=${libdir}/qt4/plugins/inputmethods \
-    MALIIT_INSTALL_PRF=${QMAKE_MKSPEC_PATH}/mkspecs/features \
-    SCHEMADIR=${sysconfdir}/gconf/schemas \
-    CONFIG+=disable-gconf \
-    CONFIG+=disable-gtk-cache-update \
-    CONFIG+=local-install \
-    CONFIG+=nosdk \
-    CONFIG+=nodoc \
-    CONFIG+=noxcb \
-    CONFIG+=enable-dbus-activation \
+FILES_${PN}-dbg += "\
+    ${OE_QMAKE_PATH_PLUGINS}/platforminputcontexts/.debug \
+    ${libdir}/maliit-framework-tests/plugins/examples/*/*/.debug \
 "
-
-EXTRA_OEMAKE += "INSTALL_ROOT=${D}"
-
-do_install_append() {
-    #Fix absolute paths
-    sed -i -e "s|/usr|${STAGING_DIR_TARGET}${prefix}|" ${D}/${libdir}/${QT_DIR_NAME}/mkspecs/features/maliit-framework.prf
-    sed -i -e "s|/usr|${STAGING_DIR_TARGET}${prefix}|" ${D}/${libdir}/${QT_DIR_NAME}/mkspecs/features/maliit-plugins.prf
-
-    install -d ${D}${datadir}/applications
-    install -m 644 ${WORKDIR}/maliit-server.desktop ${D}${datadir}/applications
-}
 
 pkg_postinst_${PN} () {
 #!/bin/sh
@@ -91,5 +82,3 @@ if [ -e "/etc/xprofile" ]; then
 fi
 rm -f /etc/xdg/autostart/maliit-server.desktop
 }
-
-S = "${WORKDIR}/git"
