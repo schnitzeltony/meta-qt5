@@ -1,0 +1,41 @@
+From 6933274e2324a5213eaad5adf1fa09205504f7d3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 1 Aug 2016 16:29:00 +0200
+Subject: [PATCH] fix build for imx6 videonode plugin
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/plugins/videonode/imx6/qsgvivantevideomaterial.cpp | 1 +
+ src/plugins/videonode/imx6/qsgvivantevideonode.cpp     | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/plugins/videonode/imx6/qsgvivantevideomaterial.cpp b/src/plugins/videonode/imx6/qsgvivantevideomaterial.cpp
+index 2e2092b..fad6417 100644
+--- a/src/plugins/videonode/imx6/qsgvivantevideomaterial.cpp
++++ b/src/plugins/videonode/imx6/qsgvivantevideomaterial.cpp
+@@ -33,6 +33,7 @@
+ 
+ #include <GLES2/gl2.h>
+ #include <GLES2/gl2ext.h>
++#define QT_OPENGL_ES_2
+ 
+ #include "qsgvivantevideomaterial.h"
+ #include "qsgvivantevideomaterialshader.h"
+diff --git a/src/plugins/videonode/imx6/qsgvivantevideonode.cpp b/src/plugins/videonode/imx6/qsgvivantevideonode.cpp
+index 229a69b..79fb085 100644
+--- a/src/plugins/videonode/imx6/qsgvivantevideonode.cpp
++++ b/src/plugins/videonode/imx6/qsgvivantevideonode.cpp
+@@ -34,6 +34,7 @@
+ #include <GLES2/gl2.h>
+ #include <GLES2/gl2ext.h>
+ 
++#define QT_OPENGL_ES_2
+ #include "qsgvivantevideonode.h"
+ #include "qsgvivantevideomaterialshader.h"
+ #include "qsgvivantevideomaterial.h"
+-- 
+2.5.5
+

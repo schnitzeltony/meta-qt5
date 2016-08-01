@@ -32,7 +32,8 @@ EXTRA_QMAKEVARS_PRE += "${@bb.utils.contains('PACKAGECONFIG', 'gstreamer010', 'G
 EXTRA_QMAKEVARS_PRE += "${@bb.utils.contains_any('PACKAGECONFIG', 'gstreamer gstreamer010', '', 'CONFIG+=done_config_gstreamer', d)}"
 
 SRC_URI += "\
-     file://0001-Initial-porting-effort-to-GStreamer-1.0.patch \
+    file://0001-Initial-porting-effort-to-GStreamer-1.0.patch \
+    file://0002-fix-build-for-imx6-videonode-plugin.patch \
 "
 
 SRCREV = "9985224a89b830dc182b428f491b6187d6f0e1ba"
