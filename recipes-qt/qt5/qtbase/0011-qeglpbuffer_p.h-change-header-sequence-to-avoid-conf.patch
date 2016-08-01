@@ -1,0 +1,32 @@
+From 940de5b0d14bc3b866f1f71cd00e96e10a18e86d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 1 Aug 2016 12:50:19 +0200
+Subject: [PATCH] qeglpbuffer_p.h: change header sequence to avoid conflicts
+ with EGL importing X11 headers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/platformsupport/eglconvenience/qeglpbuffer_p.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/platformsupport/eglconvenience/qeglpbuffer_p.h b/src/platformsupport/eglconvenience/qeglpbuffer_p.h
+index 81fdab8..aa79a0a 100644
+--- a/src/platformsupport/eglconvenience/qeglpbuffer_p.h
++++ b/src/platformsupport/eglconvenience/qeglpbuffer_p.h
+@@ -45,9 +45,9 @@
+ // We mean it.
+ //
+ 
+-#include <EGL/egl.h>
+ #include <qpa/qplatformoffscreensurface.h>
+ #include <QtPlatformSupport/private/qeglplatformcontext_p.h>
++#include <EGL/egl.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-- 
+2.5.5
+

@@ -20,6 +20,7 @@ SRC_URI += "\
     file://0006-QOpenGLPaintDevice-sub-area-support.patch \
     file://0007-linux-oe-g-Invert-conditional-for-defining-QT_SOCKLE.patch \
     file://0008-configure-paths-for-target-qmake-properly.patch \
+    file://0011-qeglpbuffer_p.h-change-header-sequence-to-avoid-conf.patch \
 "
 
 DEPENDS += "qtbase-native"
