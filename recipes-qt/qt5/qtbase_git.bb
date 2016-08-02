@@ -139,7 +139,7 @@ QT_CONFIG_FLAGS += " \
     -no-pch \
     -no-rpath \
     -pkg-config \
-    ${PACKAGECONFIG_CONFARGS} \
+    ${EXTRA_OECONF} \
 "
 
 do_generate_qt_config_file_append() {
