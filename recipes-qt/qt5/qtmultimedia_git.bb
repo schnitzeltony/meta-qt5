@@ -36,4 +36,4 @@ SRC_URI += "\
     file://0002-fix-build-for-imx6-videonode-plugin.patch \
 "
 
-SRCREV = "9985224a89b830dc182b428f491b6187d6f0e1ba"
+SRCREV = "711efc552d65f22b262e049c5a046198377519dc"

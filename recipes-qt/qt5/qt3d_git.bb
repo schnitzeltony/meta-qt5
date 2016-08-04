@@ -27,6 +27,6 @@ FILES_${PN}-qmlplugins += " \
     ${OE_QMAKE_PATH_QML}/*/*/*.obj \
 "
 
-SRCREV = "7a208d76ed96bb506899becfe680df06f95451c7"
+SRCREV = "2270fae50f8d69858b2df2287342c02a4cd5357c"
 
 BBCLASSEXTEND += "native nativesdk"
