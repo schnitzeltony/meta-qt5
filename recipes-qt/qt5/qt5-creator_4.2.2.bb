@@ -7,24 +7,22 @@ SUMMARY = "Qt Creator is a new cross-platform Qt IDE"
 # 'System GDB at /usr/bin/gdb.
 
 HOMEPAGE = "https://qt-project.org/"
-LICENSE = "LGPLv2.1 | GPLv3"
+LICENSE = "GPLv3 & The-Qt-Company-GPL-Exception-1.0"
 LIC_FILES_CHKSUM = " \
-    file://LGPL_EXCEPTION.TXT;md5=f4748b0d1a72c5c8fb5dab2dd1f7fa46 \
-    file://LICENSE.LGPLv21;md5=825920de5f6db2eeb1bebe625476346d \
-    file://LICENSE.LGPLv3;md5=0786418af032b9e608909874f334a2d1 \
+    file://LICENSE.GPL3-EXCEPT;md5=763d8c535a234d9a3fb682c7ecb6c073 \
 "
 
 inherit qmake5
 
-DEPENDS = "qtbase qtscript qtwebkit qtxmlpatterns qtx11extras qtdeclarative qttools qttools-native qtsvg qtquick1"
+DEPENDS = "qtbase qtscript qtwebkit qtwebengine qtxmlpatterns qtx11extras qtdeclarative qttools qttools-native qtsvg qtquick1"
 
 SRC_URI = " \
-    http://download.qt.io/official_releases/qtcreator/3.5/${PV}/qt-creator-opensource-src-${PV}.tar.gz \
+    http://download.qt.io/official_releases/qtcreator/4.2/${PV}/qt-creator-opensource-src-${PV}.tar.gz \
     file://0001-Fix-Allow-qt-creator-to-build-on-arm-aarch32-and-aar.patch \
     file://qtcreator.desktop.in \
 "
-SRC_URI[md5sum] = "77aef7df837eba07c7ce6037ee504c05"
-SRC_URI[sha256sum] = "5925ac818a08be919094e0f28fb4c5d8896765e0975d54d353e4c50f13d63e65"
+SRC_URI[md5sum] = "c5dad9aa00021112cc12578622c1c1c1"
+SRC_URI[sha256sum] = "0402f0e33bf3c8ee7f89c673f25fcf75fef03ba4262e077d9d9f42454d1e799b"
 
 S = "${WORKDIR}/qt-creator-opensource-src-${PV}"
 
@@ -47,15 +45,12 @@ do_compile_append() {
 do_install() {
     oe_runmake install INSTALL_ROOT=${D}${prefix}
     oe_runmake install_inst_qch_docs INSTALL_ROOT=${D}${prefix}
-    # install desktop and ensure that qt-creator finds qmake
-    install -d ${D}${datadir}/applications
-    install -m 0644 ${WORKDIR}/qtcreator.desktop.in ${D}${datadir}/applications/qtcreator.desktop
-    sed -i 's:@QT5_QMAKE@:${OE_QMAKE_PATH_QT_BINS}:g' ${D}${datadir}/applications/qtcreator.desktop
 }
 
 FILES_${PN} += " \
     ${datadir}/qtcreator \
     ${datadir}/icons \
+    ${datadir}/metainfo \
     ${libdir}${QT_DIR_NAME}/qtcreator \
 "
 FILES_${PN}-dbg += " \
@@ -69,7 +64,10 @@ FILES_${PN}-dev += " \
     ${libdir}${QT_DIR_NAME}/qtcreator/*${SOLIBSDEV} \
 "
 
-RDEPENDS_${PN} += "perl"
+RDEPENDS_${PN} += " \
+    perl \
+    bash \
+"
 RCONFLICTS_${PN} = "qt-creator"
 
 # To give best user experience out of the box..
