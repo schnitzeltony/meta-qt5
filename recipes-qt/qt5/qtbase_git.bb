@@ -138,6 +138,12 @@ QT_CONFIG_FLAGS += " \
 # since we cannot set empty set filename to a not existent file
 export OE_QMAKE_QTCONF_PATH = "foodummy"
 
+# to get the correct paths from target qmake QT_CROSS_COMPILE must be set.
+# Elder versions of Qt did set this option in configure. In recent versions
+# QT_CROSS_COMPILE must be set by us
+export QT_CROSS_COMPILE = "yes"
+
+
 do_configure() {
     # Avoid qmake error "Cannot read [...]/usr/lib/qt5/mkspecs/oe-device-extra.pri: No such file or directory" during configuration
     touch ${S}/mkspecs/oe-device-extra.pri
