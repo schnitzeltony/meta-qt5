@@ -1,8 +1,8 @@
 require python-pyqt5.inc
 
-inherit pythonnative python-dir
+inherit pythonnative
 
-DEPENDS += "sip sip-native python"
+DEPENDS += "python-sip python-sip-native python"
 
-RDEPENDS_${PN} += "python-core python-sip"
+RDEPENDS_${PN}_append_class-target = " python-core python-sip"
 

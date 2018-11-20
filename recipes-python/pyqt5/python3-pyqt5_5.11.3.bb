@@ -1,7 +1,7 @@
 require python-pyqt5.inc
 
-inherit python3native python3-dir
+inherit python3native
 
-DEPENDS += "sip3 sip3-native python3"
+DEPENDS += "python3-sip python3-sip-native python3"
 
-RDEPENDS_${PN} += "python3-core python3-sip3"
+RDEPENDS_${PN}_append_class-target = " python3-core python3-sip"
