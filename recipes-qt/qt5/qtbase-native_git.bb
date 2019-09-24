@@ -42,11 +42,13 @@ SRC_URI += "\
 # 5.10.meta-qt5-native.2
 SRC_URI += " \
     file://0013-Always-build-uic-and-qvkgen.patch \
+    file://0014-Fix-compile-issue-with-gcc-9.patch \
+    file://0015-Fix-qmake-build-with-glibc-2.28.patch \
 "
 
 # only for qtbase-native
 SRC_URI += " \
-    file://0014-Bootstrap-without-linkat-feature.patch \
+    file://0016-Bootstrap-without-linkat-feature.patch \
 "
 
 CLEANBROKEN = "1"

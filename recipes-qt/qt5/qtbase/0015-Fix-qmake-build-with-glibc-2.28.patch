@@ -1,0 +1,53 @@
+From 721d05fbe9e70518ed2288c089ff5d4036ea7ac7 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Tue, 7 Aug 2018 09:38:42 -0700
+Subject: [PATCH] Fix qmake build with glibc 2.28
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We haven't yet run the configure checks to see if statx and renameat2
+are present in glibc, so this fails when we redefine the structures and
+functions.
+
+linux/stat.h:56:8: error: redefinition of 'struct statx_timestamp'
+bits/statx.h:25:8: note: previous definition of 'struct statx_timestamp'
+qfilesystemengine_unix.cpp:110:12: error: 'int renameat2(int, const char*, int, const char*, unsigned int)' was declared 'extern' and later 'static' [-fpermissive]
+
+Change-Id: Ia741b559c24d46c78fb2fffd1548a792d22e3368
+Reviewed-by: Oswald Buddenhagen <oswald.buddenhagen@qt.io>
+Reviewed-by: Jüri Valdmann <juri.valdmann@qt.io>
+
+Upstream-Status: Backport
+---
+ src/corelib/global/qconfig-bootstrapped.h | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/global/qconfig-bootstrapped.h b/src/corelib/global/qconfig-bootstrapped.h
+index dabb715607b..3fd09f0e170 100644
+--- a/src/corelib/global/qconfig-bootstrapped.h
++++ b/src/corelib/global/qconfig-bootstrapped.h
+@@ -94,10 +94,18 @@
+ #endif
+ #define QT_NO_QOBJECT
+ #define QT_FEATURE_process -1
+-#define QT_FEATURE_renameat2 -1
++#ifdef __GLIBC_PREREQ
++# define QT_FEATURE_renameat2 (__GLIBC_PREREQ(2, 28) ? 1 : -1)
++#else
++# define QT_FEATURE_renameat2 -1
++#endif
+ #define QT_FEATURE_sharedmemory -1
+ #define QT_FEATURE_slog2 -1
+-#define QT_FEATURE_statx -1
++#ifdef __GLIBC_PREREQ
++# define QT_FEATURE_statx (__GLIBC_PREREQ(2, 28) ? 1 : -1)
++#else
++# define QT_FEATURE_statx -1
++#endif
+ #define QT_FEATURE_syslog -1
+ #define QT_NO_SYSTEMLOCALE
+ #define QT_FEATURE_systemsemaphore -1
+-- 
+2.21.0
+
