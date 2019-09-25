@@ -1,0 +1,84 @@
+From 721d05fbe9e70518ed2288c089ff5d4036ea7ac7 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Tue, 7 Aug 2018 09:38:42 -0700
+Subject: [PATCH] Fix qmake build with glibc 2.28
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We haven't yet run the configure checks to see if statx and renameat2
+are present in glibc, so this fails when we redefine the structures and
+functions.
+
+linux/stat.h:56:8: error: redefinition of 'struct statx_timestamp'
+bits/statx.h:25:8: note: previous definition of 'struct statx_timestamp'
+qfilesystemengine_unix.cpp:110:12: error: 'int renameat2(int, const char*, int, const char*, unsigned int)' was declared 'extern' and later 'static' [-fpermissive]
+
+Change-Id: Ia741b559c24d46c78fb2fffd1548a792d22e3368
+Reviewed-by: Oswald Buddenhagen <oswald.buddenhagen@qt.io>
+Reviewed-by: Jüri Valdmann <juri.valdmann@qt.io>
+
+OE-Backport: We keep renameat2 disabled and ensure it is not declared/used to
+fix build with recent pseudo which does not support renameat2.
+
+Upstream-Status: Backport
+---
+ src/corelib/global/qconfig-bootstrapped.h | 6 +++++-
+ src/corelib/io/qfilesystemengine_unix.cpp | 5 -----
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/global/qconfig-bootstrapped.h b/src/corelib/global/qconfig-bootstrapped.h
+index 5b4ff86901d..bcf4aae4388 100644
+--- a/src/corelib/global/qconfig-bootstrapped.h
++++ b/src/corelib/global/qconfig-bootstrapped.h
+@@ -97,7 +97,11 @@
+ #define QT_FEATURE_renameat2 -1
+ #define QT_FEATURE_sharedmemory -1
+ #define QT_FEATURE_slog2 -1
+-#define QT_FEATURE_statx -1
++#ifdef __GLIBC_PREREQ
++# define QT_FEATURE_statx (__GLIBC_PREREQ(2, 28) ? 1 : -1)
++#else
++# define QT_FEATURE_statx -1
++#endif
+ #define QT_FEATURE_syslog -1
+ #define QT_NO_SYSTEMLOCALE
+ #define QT_FEATURE_systemsemaphore -1
+diff --git a/src/corelib/io/qfilesystemengine_unix.cpp b/src/corelib/io/qfilesystemengine_unix.cpp
+index b974af80dcf..86011b68540 100644
+--- a/src/corelib/io/qfilesystemengine_unix.cpp
++++ b/src/corelib/io/qfilesystemengine_unix.cpp
+@@ -97,11 +97,6 @@ extern "C" NSString *NSTemporaryDirectory();
+ #  define FICLONE       _IOW(0x94, 9, int)
+ #endif
+ 
+-#  if !QT_CONFIG(renameat2) && defined(SYS_renameat2)
+-static int renameat2(int oldfd, const char *oldpath, int newfd, const char *newpath, unsigned flags)
+-{ return syscall(SYS_renameat2, oldfd, oldpath, newfd, newpath, flags); }
+-#  endif
+-
+ #  if !QT_CONFIG(statx) && defined(SYS_statx) && QT_HAS_INCLUDE(<linux/stat.h>)
+ #    include <linux/stat.h>
+ static int statx(int dirfd, const char *pathname, int flag, unsigned mask, struct statx *statxbuf)
+@@ -1276,18 +1276,6 @@ bool QFileSystemEngine::renameFile(const QFileSystemEntry &source, const QFileSy
+     if (Q_UNLIKELY(srcPath.isEmpty() || tgtPath.isEmpty()))
+         return emptyFileEntryWarning(), false;
+ 
+-#if defined(RENAME_NOREPLACE) && (QT_CONFIG(renameat2) || defined(SYS_renameat2))
+-    if (renameat2(AT_FDCWD, srcPath, AT_FDCWD, tgtPath, RENAME_NOREPLACE) == 0)
+-        return true;
+-
+-    // If we're using syscall(), check for ENOSYS;
+-    // if renameat2 came from libc, we don't accept ENOSYS.
+-    // We can also get EINVAL for some non-local filesystems.
+-    if ((QT_CONFIG(renameat2) || errno != ENOSYS) && errno != EINVAL) {
+-        error = QSystemError(errno, QSystemError::StandardLibraryError);
+-        return false;
+-    }
+-#endif
+ #if defined(Q_OS_DARWIN) && defined(RENAME_EXCL)
+     if (__builtin_available(macOS 10.12, iOS 10, tvOS 10, watchOS 3, *)) {
+         if (renameatx_np(AT_FDCWD, srcPath, AT_FDCWD, tgtPath, RENAME_EXCL) == 0)
+-- 
+2.21.0
+
