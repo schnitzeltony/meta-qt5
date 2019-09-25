@@ -47,6 +47,7 @@ SRC_URI += "\
 # 5.10.meta-qt5-native.2
 SRC_URI += " \
     file://0013-Always-build-uic-and-qvkgen.patch \
+    file://0014-Fix-compile-issue-with-gcc-9.patch \
 "
 
 # CMake's toolchain configuration of nativesdk-qtbase
